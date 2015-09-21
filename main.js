@@ -48,6 +48,7 @@ var player = new Player();
 var keyboard = new Keyboard();
 
 var enemy = new Enemy();
+var bullet = new Bullet();
 
 function run()
 {
@@ -56,11 +57,17 @@ function run()
 	
 	var deltaTime = getDeltaTime();
 	
-	player.update(deltaTime);
+	//player.update(deltaTime);
 	player.draw();
 
-	enemy.update(deltaTime);
-	enemy.draw();	
+	//enemy.update(deltaTime);
+	//enemy.draw();	
+	
+	if (keyboard.isKeyDown(keyboard.KEY_RIGHT) == true)
+	{
+		bullet.update();
+		bullet.draw();
+	}
 		
 	// update the frame counter 
 	fpsTime += deltaTime;
