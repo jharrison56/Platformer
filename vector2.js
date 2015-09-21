@@ -30,7 +30,7 @@ Vector2.prototype.subtract = function(v2)
 	this.y = this.y - v2.y;
 }
 
-Vector2.prototype.multiplyScalar(num)
+Vector2.prototype.multiplyScalar = function(num)
 {
 	this.x = this.x * num;
 	this.y = this.y * num;
