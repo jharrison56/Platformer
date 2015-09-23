@@ -3,27 +3,21 @@ var Bullet = function()
 	this.image = document.createElement("img");
 	this.x = player.x;
 	this.y = player.y;
-	this.width = 5;
-	this.height = 5;
-	this.velocityX = 0;
-	this.velocityY = 1;
+	this.width = 10;
+	this.height = 10;
+	this.velocityX = 10;
+	this.velocityY = 0;
 	
 	this.image.src = "bullet.png";
 };
 
 Bullet.prototype.update = function()
 {
-	var velX = 0;
-	var velY = 1;
-	
-	var s = Math.sin(player.rotation);
-	var c = Math.cos(player.rotation);
-	
-	this.velX = (velX * c) - (velY * s);
-	this.velY = (velX * s) + (velY * c);
-	
-	this.velocityX = this.velX * 500;
-	this.velocityY = this.velY * 500;
+	if (keyboard.isKeyDown(keyboard.KEY_RIGHT) == true)
+	{
+		this.x = this.x + this.velocityX;
+		this.y = this.y + this.velocityY;
+	}
 }
 
 Bullet.prototype.draw = function()
