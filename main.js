@@ -31,8 +31,9 @@ function getDeltaTime()
 
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
+
 var LAYER_COUNT = 3;
-var MAP = {tw: 60, th:15};
+var MAP = {tw: 50, th:15};
 var TILE = 35;
 var TILESET_TILE = TILE * 2;
 var TILESET_PADDING = 2;
@@ -43,16 +44,23 @@ var LAYER_COUNT = 3;
 var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
+
 var METER = TILE;
 var GRAVITY = METER * 9.8 * 6;
 var MAXDX = METER * 10;
 var MAXDY = METER * 15;
 var ACCEL = MAXDX * 2;
 var FRICTION = MAXDX * 6;
-var JUMP = METER * 1500;
+var JUMP = METER * 1600;
 
+var STATE_SPLASH = 0;
+var STATE_GAME = 1;
+var STATE_GAMEOVER = 2;
+var STATE_HIGHSCORE = 3;
 
-// some variables to calculate the Frames Per Second (FPS - this tells use
+var gameState = STATE_SPLASH;
+
+// some variables to calculate the Frames Per Second (FPS - this tells us
 // how fast our game is running, and allows us to make the game run at a 
 // constant speed)
 var fps = 0;
@@ -181,36 +189,28 @@ function initialise()
 
 function run()
 {
-	context.fillStyle = "#ccc";		
-	context.fillRect(0, 0, canvas.width, canvas.height);
+	//var deltaTime = getDeltaTime();
 	
-	drawMap();
-	
-	var deltaTime = getDeltaTime();
-	
-	player.update(deltaTime);
-	player.draw();
-
-	//enemy.update(deltaTime);
-	//enemy.draw();	
-	
-	bullet.update();
-	bullet.draw();
-		
-	// update the frame counter 
-	fpsTime += deltaTime;
-	fpsCount++;
-	if(fpsTime >= 1)
+	switch (gameState)
 	{
-		fpsTime -= 1;
-		fps = fpsCount;
-		fpsCount = 0;
-	}		
-		
-	// draw the FPS
-	context.fillStyle = "#f00";
-	context.font="14px Arial";
-	context.fillText("FPS: " + fps, 5, 20, 100);
+		case STATE_SPLASH:
+			gameStateSplash();
+			break;
+			
+		case STATE_GAME:
+			gameStateGame();
+			break;
+			
+		case STATE_GAMEOVER:
+			gameStateGameOver();
+			break;
+			
+		case STATE_HIGHSCORE:
+			gameStateHighscore();
+			break;
+	}
+	
+	
 }
 
 //calls the initialise function

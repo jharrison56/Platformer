@@ -35,3 +35,11 @@ Vector2.prototype.multiplyScalar = function(num)
 	this.x = this.x * num;
 	this.y = this.y * num;
 }
+
+Vector2.prototype.copy = function(v2)
+{
+	v2 = new Vector2();
+	v2.x = this.x;
+	v2.y = this.y;
+	return v2;
+}
