@@ -67,11 +67,11 @@ tileset.src = "tileset.png";
 var chuckNorris = document.createElement("img");
 chuckNorris.src = "hero.png";
 
-//creates new player object
-var player = new Player();
-
 //creates new keyboard object
 var keyboard = new Keyboard();
+
+//creates new player object
+var player = new Player();
 
 //creates new enemy object
 var enemy = new Enemy();
@@ -188,7 +188,7 @@ function run()
 	
 	var deltaTime = getDeltaTime();
 	
-	//player.update(deltaTime);
+	player.update(deltaTime);
 	player.draw();
 
 	//enemy.update(deltaTime);
