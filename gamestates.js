@@ -29,8 +29,8 @@ function gameStateGame(deltaTime)
 	//enemy.update(deltaTime);
 	//enemy.draw();	
 	
-	bullet.update();
-	bullet.draw();
+	//bullet.update();
+	//bullet.draw();
 		
 	// update the frame counter 
 	fpsTime += deltaTime;
@@ -44,7 +44,7 @@ function gameStateGame(deltaTime)
 		
 	// draw the FPS
 	context.fillStyle = "#f00";
-	context.font="14px Arial";
+	context.font = "14px Arial";
 	context.fillText("FPS: " + fps, 5, 20, 100);
 }
 
@@ -56,5 +56,7 @@ function gameStateGameOver()
 
 function gameStateHighscore()
 {
-	
+	context.fillStyle = "black";
+	context.fillRect(0, 0, canvas.width, canvas.height)
+	context.font = "14px Arial";
 }

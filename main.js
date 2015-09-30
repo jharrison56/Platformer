@@ -60,6 +60,9 @@ var STATE_HIGHSCORE = 3;
 
 var gameState = STATE_SPLASH;
 
+var musicBackground;
+var sfxFire;
+
 // some variables to calculate the Frames Per Second (FPS - this tells us
 // how fast our game is running, and allows us to make the game run at a 
 // constant speed)
@@ -72,8 +75,8 @@ var tileset = document.createElement("img");
 tileset.src = "tileset.png";
 
 // load an image to draw
-var chuckNorris = document.createElement("img");
-chuckNorris.src = "hero.png";
+//var chuckNorris = document.createElement("img");
+//chuckNorris.src = "hero.png";
 
 //creates new keyboard object
 var keyboard = new Keyboard();
@@ -85,7 +88,7 @@ var player = new Player();
 var enemy = new Enemy();
 
 //creates new bullet object. Theoretically. 
-var bullet = new Bullet();
+var bullet = [];
 
 //checks if there is a tile with a collision at the pixel coordinates on the given layer
 function cellAtPixelCoord(layer, x, y)
@@ -185,11 +188,31 @@ function initialise()
 			}
 		}
 	}
+	
+	//creating howler (audio) objects
+	musicBackground = new Howl(
+	{
+		urls: ["background.ogg"],
+		loop: true,
+		buffer: true,
+		volume: 0.5,
+	});
+	musicBackground.play();
+	
+	sfxFire = new Howl(
+	{
+		urls: ["fireEffect.ogg"],
+		buffer: true,
+		volume: 1,
+		onend: function() 
+		{
+			isSfxPlaying = false;
+		}
+	});
 }
 
 function run()
 {
-	//var deltaTime = getDeltaTime();
 	
 	switch (gameState)
 	{
