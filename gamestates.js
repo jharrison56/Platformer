@@ -21,6 +21,29 @@ function gameStateGame(deltaTime)
 	player.update(deltaTime);
 	player.draw();
 	
+	//sets the image for the gun icon
+	var gun = document.createElement("img");
+	gun.src = ("gunIcon.png");
+	
+	//draws the gun icon
+	context.drawImage(gun, 5, 5);
+	
+	//draws the score
+	context.fillStyle = "red";
+	context.font="24px Arial bold";
+	var scoreText = "Score: " + score;
+	context.fillText(scoreText, 58, 38);
+	
+	//sets the image for the hearts/lives
+	var heart = document.createElement("img");
+	heart.src = ("heartImage.png");
+
+	//draws the lives
+	for (var i=0; i<lives; i++)
+	{
+		context.drawImage(heart, 505 + ((heart.width + 2) * i), 23);
+	}
+	
 	if (player.position.y > SCREEN_HEIGHT)
 	{
 		gameState = STATE_GAMEOVER;
@@ -33,7 +56,7 @@ function gameStateGame(deltaTime)
 	//bullet.draw();
 		
 	// update the frame counter 
-	fpsTime += deltaTime;
+	/*fpsTime += deltaTime;
 	fpsCount++;
 	if(fpsTime >= 1)
 	{
@@ -45,7 +68,7 @@ function gameStateGame(deltaTime)
 	// draw the FPS
 	context.fillStyle = "#f00";
 	context.font = "14px Arial";
-	context.fillText("FPS: " + fps, 5, 20, 100);
+	context.fillText("FPS: " + fps, 5, 20, 100);*/
 }
 
 function gameStateGameOver()

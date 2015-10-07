@@ -74,6 +74,12 @@ var fpsTime = 0;
 var tileset = document.createElement("img");
 tileset.src = "tileset.png";
 
+//create a score variable
+var score = 0;
+
+//creates a variable for number of lives
+var lives = 3;
+
 // load an image to draw
 //var chuckNorris = document.createElement("img");
 //chuckNorris.src = "hero.png";
