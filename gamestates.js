@@ -141,6 +141,29 @@ function gameStateGameOver()
 		player.isDead = false;
 		player.position = new Vector2();
 		player.position.set (9 * TILE, 7 * TILE);
+		player.velocity.set (0, 0);
+		initialise();
+	}
+}
+
+function gameStateWin()
+{
+	context.fillStyle = "black";
+	context.fillRect (0, 0, canvas.width, canvas.height);
+	
+	context.fillStyle = "yellow";
+	context.font = "24px Arial bold";
+	context.fillText("Congratulations!", 250, 150);
+	context.fillText("Press enter to play again", 220, 200);
+	
+	if (keyboard.isKeyDown(keyboard.KEY_ENTER) == true)
+	{
+		gameState = STATE_GAME;
+		enemies = [];
+		player.isDead = false;
+		player.position = new Vector2();
+		player.position.set (9 * TILE, 7 * TILE);
+		player.velocity.set (0, 0);
 		initialise();
 	}
 }

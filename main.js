@@ -69,7 +69,7 @@ var ENEMY_ACCEL = ENEMY_MAXDX * 2;
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
 var STATE_GAMEOVER = 2;
-var STATE_HIGHSCORE = 3;
+var STATE_WIN = 3;
 
 var gameState = STATE_SPLASH;
 
@@ -92,10 +92,6 @@ var score = 0;
 
 //creates a variable for number of lives
 var lives = 0;
-
-// load an image to draw
-//var chuckNorris = document.createElement("img");
-//chuckNorris.src = "hero.png";
 
 //creates new keyboard object
 var keyboard = new Keyboard();
@@ -332,8 +328,8 @@ function run()
 			gameStateGameOver();
 			break;
 			
-		case STATE_HIGHSCORE:
-			gameStateHighscore();
+		case STATE_WIN:
+			gameStateWin();
 			break;
 	}
 	
