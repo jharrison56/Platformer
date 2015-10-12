@@ -32,6 +32,16 @@ function getDeltaTime()
 var SCREEN_WIDTH = canvas.width;
 var SCREEN_HEIGHT = canvas.height;
 
+//create bullet array
+var bullets = [];
+
+//enemy constants
+var ENEMY_MAXDX = METER * 5;
+var ENEMY_ACCEL = ENEMY_MAXDX * 2;
+
+//create enemy array
+var enemies = [];
+
 var LAYER_COUNT = 3;
 var MAP = {tw: 50, th:15};
 var TILE = 35;
@@ -44,6 +54,9 @@ var LAYER_COUNT = 3;
 var LAYER_BACKGROUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
+
+var LAYER_OBJECT_ENEMIES = 3;
+var LAYER_OBJECT_TRIGGERS = 4;
 
 var METER = TILE;
 var GRAVITY = METER * 9.8 * 6;
@@ -96,6 +109,16 @@ var enemy = new Enemy();
 //creates new bullet object. Theoretically. 
 var bullet = [];
 
+//creates function for checking collisions
+function intersects (x1, y1, w1, h1, x2, y2, w2, h2)
+{
+	if(y2 + h2 < y1 || x2 + w2 < x1 || x2 > x1 + w1 || y2 > y1 + h1)
+	{
+		return false;
+	}
+	return true;
+}
+
 //checks if there is a tile with a collision at the pixel coordinates on the given layer
 function cellAtPixelCoord(layer, x, y)
 {
@@ -140,23 +163,52 @@ function bound (value, min, max)
 	return value;
 };
 
-
+var worldOffsetX = 0;
 //draws the level
 function drawMap()
 {
+	var startX = -1;
+	
+	//works out how many tiles can fit on screen
+	var maxTiles = Math.floor(SCREEN_WIDTH / TILE) + 2;
+	
+	//calculate the tile the player is currently on
+	var tileX = pixelToTile(player.position.x);
+	
+	//calculates the offset of the player
+	var offsetX = TILE + Math.floor(player.position.x % TILE);
+	
+	//calculates the starting tile for the x-axis to draw fromCharCode
+	startX = tileX - Math.floor(maxTiles / 2);
+	
+	if(startX < -1)
+	{
+		startX = 0;
+		offsetX = 0;
+	}
+	
+	if(startX > MAP.tw - maxTiles)
+	{
+		startX = MAP.tw - maxTiles + 1;
+		offsetX = TILE;
+	}
+	
+	worldOffsetX = startX * TILE + offsetX;
+	
 	for(var layerIdx=0; layerIdx < LAYER_COUNT; layerIdx++)
 	{
-		var idx = 0;
 		for (var y = 0; y < level1.layers[layerIdx].height; y++)
 		{
-			for (var x = 0; x < level1.layers[layerIdx].width; x++)
+			var idx = y * level1.layers[layerIdx].width + startX;
+			
+			for (var x = startX; x < startX + maxTiles; x++)
 			{
 				if (level1.layers[layerIdx].data[idx] != 0)
 				{
 					var tileIndex = level1.layers[layerIdx].data[idx] - 1;
 					var sx = TILESET_PADDING + (tileIndex % TILESET_COUNT_X) * (TILESET_TILE + TILESET_SPACING);
 					var sy = TILESET_PADDING + (Math.floor(tileIndex / TILESET_COUNT_Y)) * (TILESET_TILE + TILESET_SPACING);
-					context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE, x * TILE, (y-1) * TILE, TILESET_TILE, TILESET_TILE);
+					context.drawImage(tileset, sx, sy, TILESET_TILE, TILESET_TILE, (x - startX) * TILE - offsetX, (y-1) * TILE, TILESET_TILE, TILESET_TILE);
 				}
 				idx++;
 			}
@@ -165,6 +217,7 @@ function drawMap()
 }
 
 var cells = [];			//this is the array that holds the simplified collision data
+
 function initialise() 
 {
 	for (var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++)		//initialises the collision map
@@ -192,6 +245,47 @@ function initialise()
 				}
 				idx++;
 			}
+		}
+	}
+	
+	//add enemies
+	idx = 0;
+	for (var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++)
+	{
+		for (var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++)
+		{
+			if (level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0)
+			{
+				var px = tileToPixel(x);
+				var py = tileToPixel(y);
+				var e = new Enemy(px, py);
+				enemies.push(e);
+			}
+			idx++;
+		}
+	}
+	
+	//initialise trigger layer in collision map
+	cells[LAYER_OBJECT_TRIGGERS] = [];
+	idx = 0;
+	for (var y = 0; y < level1.layers[LAYER_OBJECT_TRIGGERS].height; y++)
+	{
+		cells[LAYER_OBJECT_TRIGGERS][y] = [];
+		for (var x = 0; x < level1.layers[LAYER_OBJECT_TRIGGERS].width; x++)
+		{
+			if (level1.layers[LAYER_OBJECT_TRIGGERS].data[idx] != 0)
+			{
+				cells[LAYER_OBJECT_TRIGGERS][y][x] = 1;
+				cells[LAYER_OBJECT_TRIGGERS][y-1][x] = 1;
+				cells[LAYER_OBJECT_TRIGGERS][y-1][x+1] = 1;
+				cells[LAYER_OBJECT_TRIGGERS][y][x+1] = 1;
+			}
+			
+			else if (cells[LAYER_OBJECT_TRIGGERS][y][x] != 1)
+			{
+				cells[LAYER_OBJECT_TRIGGERS][y][x] = 0;
+			}
+			idx++;
 		}
 	}
 	

@@ -1,21 +1,30 @@
-var Bullet = function()
+var Bullet = function(x, y, moveRight)
 {
-	this.image = document.createElement("img");
-	this.x = player.x;
-	this.y = player.y;
-	this.width = 10;
-	this.height = 10;
-	this.velocity = player.direction;
+	this.sprite = new Sprite("bullet.png");
+	this.sprite.buildAnimation(1, 1, 32, 32, -1, [0]);
+	this.sprite.setAnimationOffset(0, 0, 0);
+	this.sprite.setLoop(0, false);
 	
-	this.image.src = "bullet.png";
+	this.position = new Vector2();
+	this.position.set(x, y);
+	
+	this.velocity = new Vector2();
+	
+	this.moveRight = moveRight;
+	if(this.moveRight == true)
+		this.velocity.set(MAXDX * 2, 0);
+	else
+		this.velocity.set(-MAXDX * 2, 0);
 };
 
-/*Bullet.prototype.update = function()
-{
+Bullet.prototype.update = function(deltaTime)
+{	
+	this.sprite.update(deltaTime);
+	this.position.x = Math.floor(this.position.x + (deltaTime * this.velocity.x));
+}
 
-}*/
-
-Bullet.prototype.draw = function()
+Bullet.prototype.draw = function(deltaTime)
 {
-	context.drawImage(this.image, -this.width/2, -this.height/2);	
+	var screenX = this.position.x - worldOffsetX;
+	this.sprite.draw(context, screenX, this.position.y);
 }

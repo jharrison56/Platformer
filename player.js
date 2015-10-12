@@ -39,7 +39,6 @@ var Player = function()
 		this.sprite.setAnimationOffset(i, -55, -87);
 	}
 	
-	//this.image = document.createElement("img");
 	this.position = new Vector2();
 	this.position.set (9 * TILE, 7 * TILE);
 	
@@ -47,18 +46,14 @@ var Player = function()
 	this.width = 159;
 	this.height = 163;
 	
-	//this.offset = new Vector2();
-	//this.offset.set (-55, -87);
-	
 	this.velocity = new Vector2();
 	
 	this.falling = true;
 	this.jumping = false;
 	this.shooting = false;
+	this.climbing = false;
 	
 	this.direction = LEFT;
-	
-	//this.image.src = "hero.png";
 	
 	this.cooldownTimer = 0;
 };
@@ -70,6 +65,7 @@ Player.prototype.update = function(deltaTime)
 	var left = false;
 	var right = false;
 	var jump = false;
+	var shoot = false;
 	
 	//check key press events & sets correct animation
 	if (keyboard.isKeyDown(keyboard.KEY_LEFT) == true)
@@ -86,6 +82,21 @@ Player.prototype.update = function(deltaTime)
 		this.direction = RIGHT;
 		if (this.sprite.currentAnimation != ANIM_WALK_RIGHT && this.jumping == false)
 			this.sprite.setAnimation (ANIM_WALK_RIGHT);
+	}
+	
+	else if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true)
+	{
+		if (this.direction == LEFT)
+		{
+			if (this.sprite.currentAnimation != ANIM_SHOOT_LEFT && this.jumping == false)
+				this.sprite.setAnimation (ANIM_SHOOT_LEFT);
+		}
+		
+		else 
+		{
+			if (this.sprite.currentAnimation != ANIM_SHOOT_RIGHT && this.jumping == false)
+				this.sprite.setAnimation (ANIM_SHOOT_RIGHT);
+		}				
 	}
 	
 	else
@@ -106,6 +117,7 @@ Player.prototype.update = function(deltaTime)
 		}
 	}
 	
+	//makes player jump
 	if (keyboard.isKeyDown(keyboard.KEY_UP) == true)
 	{
 		jump = true;
@@ -122,33 +134,21 @@ Player.prototype.update = function(deltaTime)
 		}
 	}
 	
+	//sets a cool down timer for the bullets so there is a space between each one when fired
 	if (this.cooldownTimer > 0)
 	{
 		this.cooldownTimer = this.cooldownTimer - deltaTime;
 	}
 	
+	//shoots a bullet
 	if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true && this.cooldownTimer <= 0)
 	{
 		sfxFire.play()
 		this.cooldownTimer = 0.3;
 		
 		//shoot a bullet
-		
-	}
-
-	if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true)
-	{
-		if (this.direction == LEFT)
-		{
-			if (this.sprite.currentAnimation != ANIM_SHOOT_LEFT && this.jumping == false)
-				this.sprite.setAnimation (ANIM_SHOOT_LEFT);
-		}
-		
-		else 
-		{
-			if (this.sprite.currentAnimation != ANIM_SHOOT_RIGHT && this.jumping == false)
-				this.sprite.setAnimation (ANIM_SHOOT_RIGHT);
-		}				
+		var bullet = new Bullet(player.position.x, player.position.y, player.direction == RIGHT);
+		bullets.push(bullet);
 	}
 	
 	var wasleft = this.velocity.x < 0;
@@ -201,6 +201,8 @@ Player.prototype.update = function(deltaTime)
 	var celldown = cellAtTileCoord(LAYER_PLATFORMS, tx, ty + 1);
 	var celldiag = cellAtTileCoord(LAYER_PLATFORMS, tx +1, ty + 1);
 	
+
+	
 	//If the player has vertical velocity, then check to see if they have hit a platform above or below, in which case stop their vertical velocity and clamp the y position
 	if (this.velocity.y > 0)
 	{
@@ -230,7 +232,7 @@ Player.prototype.update = function(deltaTime)
 	}
 	
 	if (this.velocity.x > 0)
-	{
+	{		
 		if ((cellright && !cell) || (celldiag && !celldown && ny)) 
 		{
 			//clamp the x position to avoid moving into the platform we just hit
@@ -248,14 +250,14 @@ Player.prototype.update = function(deltaTime)
 			this.velocity.x = 0;			//stop horizontal velocity
 		}
 	}
+	
+	if (cellAtTileCoord(LAYER_OBJECT_TRIGGERS, tx, ty) == true)
+	{
+		gameState = STATE_GAMEOVER;
+	}
 }
 
 Player.prototype.draw = function()
 {
-	this.sprite.draw(context, this.position.x, this.position.y);
-	
-	/*context.save();
-		context.translate(this.position.x, this.position.y);
-		context.drawImage(this.image, -this.width/2, -this.height/2);
-	context.restore();*/
+	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
 }

@@ -1,7 +1,10 @@
 function gameStateSplash()
 {
-	context.fillStyle = "#ccc";
-	context.fillRect(0, 0, canvas.width, canvas.height);
+	var splashScreen = document.createElement("img");
+	splashScreen.src = "startscreen.png";
+	context.drawImage (splashScreen, 0, 0);
+	
+	player.draw();
 	
 	if (keyboard.isKeyDown(keyboard.KEY_SPACE) == true)
 	{
@@ -18,8 +21,70 @@ function gameStateGame(deltaTime)
 	
 	var deltaTime = getDeltaTime();
 	
+	//updates everything
 	player.update(deltaTime);
-	player.draw();
+	
+	for(var i = 0; i < enemies.length; i++)
+	{
+		enemies[i].update(deltaTime);
+	}
+	
+	//updates bullets and checks collisions
+	var hit = false;
+	
+	for(var i = 0; i < bullets.length; i++)
+	{
+		bullets[i].update(deltaTime);
+		if(bullets[i].position.x - worldOffsetX < 0 || bullets[i].position.y - worldOffsetX > SCREEN_WIDTH)
+		{
+			hit = true;
+		}
+		
+		for(var j = 0; j < enemies.length; j++)
+		{
+			if(intersects (bullets[i].position.x, bullets[i].position.y, TILE, TILE, enemies[j].position.x, enemies[j].position.y, TILE, TILE) == true)
+			{
+				//kills both the bullet and the enemy
+				enemies.splice(j, 1);
+				hit = true;
+				
+				//increment player score
+				score = score + 1;
+				break;
+			}
+		}
+		
+		if(hit == true)
+		{
+			bullets.splice(i, 1);
+			break;
+		}
+	}
+	
+	//collision detection for player & enemies
+	for (var i = 0; i < enemies.length; i++)
+	{
+		if(intersects (enemies[i].position.x, enemies[i].position.y, TILE, TILE, player.position.x, player.position.y, TILE, TILE))
+		{
+			enemies.splice(i, 1);
+			lives = lives - 1;
+			player.position = new Vector2();
+			player.position.set (9 * TILE, 7 * TILE);
+		}
+	}
+	
+	//draws everything
+	player.draw(deltaTime);
+	
+	for(var i = 0; i < enemies.length; i++)
+	{
+		enemies[i].draw(deltaTime);
+	}
+	
+	for(var j = 0; j < bullets.length; j++)
+	{
+		bullets[j].draw(deltaTime);
+	}
 	
 	//sets the image for the gun icon
 	var gun = document.createElement("img");
@@ -36,50 +101,39 @@ function gameStateGame(deltaTime)
 	
 	//sets the image for the hearts/lives
 	var heart = document.createElement("img");
-	heart.src = ("heartImage.png");
-
+	heart.src = ("heartImage.png");	
+	
 	//draws the lives
 	for (var i=0; i<lives; i++)
 	{
 		context.drawImage(heart, 505 + ((heart.width + 2) * i), 23);
 	}
 	
+	//if the player falls off the screen, take away a life and reset the player position to the starting position
 	if (player.position.y > SCREEN_HEIGHT)
 	{
-		gameState = STATE_GAMEOVER;
+		lives = lives - 1;
+		player.position = new Vector2();
+		player.position.set (9 * TILE, 7 * TILE);
 	}
-
-	//enemy.update(deltaTime);
-	//enemy.draw();	
 	
-	//bullet.update();
-	//bullet.draw();
-		
-	// update the frame counter 
-	/*fpsTime += deltaTime;
-	fpsCount++;
-	if(fpsTime >= 1)
+	//if all lives are gone, go to the game over screen
+	if (lives == 0)
 	{
-		fpsTime -= 1;
-		fps = fpsCount;
-		fpsCount = 0;
-	}		
-		
-	// draw the FPS
-	context.fillStyle = "#f00";
-	context.font = "14px Arial";
-	context.fillText("FPS: " + fps, 5, 20, 100);*/
+		gameState = STATE_GAMEOVER;
+	}	
 }
 
 function gameStateGameOver()
 {
-	context.fillStyle = "black";
-	context.fillRect(0, 0, canvas.width, canvas.height)
-}
-
-function gameStateHighscore()
-{
-	context.fillStyle = "black";
-	context.fillRect(0, 0, canvas.width, canvas.height)
-	context.font = "14px Arial";
+	var gameOver = document.createElement("img");
+	gameOver.src = "gameover.png";
+	context.drawImage(gameOver, 0, 0);
+	
+	if (keyboard.isKeyDown(keyboard.KEY_ENTER) == true)
+	{
+		gameState = STATE_GAME;
+		lives = 4;
+		score = 0;
+	}
 }
