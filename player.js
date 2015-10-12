@@ -56,6 +56,8 @@ var Player = function()
 	this.direction = LEFT;
 	
 	this.cooldownTimer = 0;
+	
+	this.isDead = false;
 };
 
 Player.prototype.update = function(deltaTime)

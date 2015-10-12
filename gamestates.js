@@ -21,12 +21,21 @@ function gameStateGame(deltaTime)
 	
 	var deltaTime = getDeltaTime();
 	
-	//updates everything
+	//updates player
 	player.update(deltaTime);
 	
-	for(var i = 0; i < enemies.length; i++)
+	//updates enemies
+	
+	for (var i = 0; i < enemies.length; i++)
 	{
 		enemies[i].update(deltaTime);
+		if (!player.isDead)
+			if(intersects (enemies[i].position.x, enemies[i].position.y, TILE, TILE, player.position.x, player.position.y, TILE, TILE))
+			{
+				lives = lives - 1;
+				player.position = new Vector2();
+				player.position.set (9 * TILE, 7 * TILE);
+			}
 	}
 	
 	//updates bullets and checks collisions
@@ -61,26 +70,19 @@ function gameStateGame(deltaTime)
 		}
 	}
 	
-	//collision detection for player & enemies
-	for (var i = 0; i < enemies.length; i++)
+	//draws player
+	if (!player.isDead)
 	{
-		if(intersects (enemies[i].position.x, enemies[i].position.y, TILE, TILE, player.position.x, player.position.y, TILE, TILE))
-		{
-			enemies.splice(i, 1);
-			lives = lives - 1;
-			player.position = new Vector2();
-			player.position.set (9 * TILE, 7 * TILE);
-		}
-	}
-	
-	//draws everything
 	player.draw(deltaTime);
-	
+	}
+
+	//draws enemies
 	for(var i = 0; i < enemies.length; i++)
 	{
 		enemies[i].draw(deltaTime);
 	}
-	
+
+	//draws bullets
 	for(var j = 0; j < bullets.length; j++)
 	{
 		bullets[j].draw(deltaTime);
@@ -115,11 +117,13 @@ function gameStateGame(deltaTime)
 		lives = lives - 1;
 		player.position = new Vector2();
 		player.position.set (9 * TILE, 7 * TILE);
+		
 	}
 	
 	//if all lives are gone, go to the game over screen
 	if (lives == 0)
 	{
+		player.isDead = true;
 		gameState = STATE_GAMEOVER;
 	}	
 }
@@ -133,7 +137,10 @@ function gameStateGameOver()
 	if (keyboard.isKeyDown(keyboard.KEY_ENTER) == true)
 	{
 		gameState = STATE_GAME;
-		lives = 4;
-		score = 0;
+		enemies = [];
+		player.isDead = false;
+		player.position = new Vector2();
+		player.position.set (9 * TILE, 7 * TILE);
+		initialise();
 	}
 }

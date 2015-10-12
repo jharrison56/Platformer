@@ -1,27 +1,36 @@
 var LEFT = 0;
 var RIGHT = 1;
 
-
+var ANIM_ENEMY_RIGHT = 0;
+var ANIM_ENEMY_LEFT = 1;
+var ANIM_ENEMY_MAX = 2;
 
 var Enemy = function(x, y)
 {
 	this.sprite = new Sprite("ninja.png");
 	this.sprite.buildAnimation(5, 2, 88, 88, 0.5, [0, 1, 2, 3, 4]);
-	this.sprite.setAnimationOffset(0, -35, -35);
+	this.sprite.buildAnimation(5, 2, 80, 80, 0.5, [5, 6, 7, 8, 9]);
+	
+	for(var i = 0; i < ANIM_ENEMY_MAX; i++)
+	{
+		this.sprite.setAnimationOffset(i, -44, -44);
+	}
 	
 	this.position = new Vector2();
-	this.position.set = (x, y);
+	this.position.set(x, y);
 	
 	this.velocity = new Vector2();
 	
 	this.moveRight = true;
 	this.pause = 0;
+	
+	this.direction = RIGHT;
 }
 
 Enemy.prototype.update = function(deltaTime)
 {
 	this.sprite.update(deltaTime);
-	
+		
 	if(this.pause > 0)
 	{
 		this.pause = this.pause - deltaTime;
@@ -43,9 +52,12 @@ Enemy.prototype.update = function(deltaTime)
 	
 		if(this.moveRight)
 		{
+			this.sprite.setAnimation(ANIM_ENEMY_RIGHT);
+			
 			if(celldiag && !cellright)
 			{
 				ddx = ddx + ENEMY_ACCEL;	//enemy wants to go right
+				
 			}
 			
 			else
@@ -58,9 +70,13 @@ Enemy.prototype.update = function(deltaTime)
 		
 		if(!this.moveRight)
 		{
+			this.sprite.setAnimation(ANIM_ENEMY_LEFT);
+			
+			this.direction = LEFT;
 			if(celldown && !cell)
 			{
 				ddx = ddx - ENEMY_ACCEL;	//enemy wants to go left
+				
 			}
 			
 			else
@@ -77,7 +93,7 @@ Enemy.prototype.update = function(deltaTime)
 	}
 }
 
-Enemy.prototype.draw = function()
+Enemy.prototype.draw = function(deltaTime)
 {
 	this.sprite.draw(context, this.position.x - worldOffsetX, this.position.y);
 }

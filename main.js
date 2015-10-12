@@ -35,10 +35,6 @@ var SCREEN_HEIGHT = canvas.height;
 //create bullet array
 var bullets = [];
 
-//enemy constants
-var ENEMY_MAXDX = METER * 5;
-var ENEMY_ACCEL = ENEMY_MAXDX * 2;
-
 //create enemy array
 var enemies = [];
 
@@ -66,6 +62,10 @@ var ACCEL = MAXDX * 2;
 var FRICTION = MAXDX * 6;
 var JUMP = METER * 1600;
 
+//enemy constants
+var ENEMY_MAXDX = METER * 5;
+var ENEMY_ACCEL = ENEMY_MAXDX * 2;
+
 var STATE_SPLASH = 0;
 var STATE_GAME = 1;
 var STATE_GAMEOVER = 2;
@@ -91,7 +91,7 @@ tileset.src = "tileset.png";
 var score = 0;
 
 //creates a variable for number of lives
-var lives = 3;
+var lives = 0;
 
 // load an image to draw
 //var chuckNorris = document.createElement("img");
@@ -106,7 +106,7 @@ var player = new Player();
 //creates new enemy object
 var enemy = new Enemy();
 
-//creates new bullet object. Theoretically. 
+//creates new bullet object 
 var bullet = [];
 
 //creates function for checking collisions
@@ -220,6 +220,9 @@ var cells = [];			//this is the array that holds the simplified collision data
 
 function initialise() 
 {
+	lives = 3;
+	score = 0;
+	
 	for (var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++)		//initialises the collision map
 	{
 		cells[layerIdx] = [];
@@ -254,6 +257,7 @@ function initialise()
 	{
 		for (var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++)
 		{
+		
 			if (level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0)
 			{
 				var px = tileToPixel(x);
